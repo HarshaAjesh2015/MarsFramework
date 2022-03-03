@@ -35,23 +35,23 @@ namespace MarsFramework.Global
                 case 1:
                     GlobalDefinitions.driver = new FirefoxDriver();
                     break;
-                case 2:  
+                case 2:
                     ChromeOptions options = new ChromeOptions();
                     options.BinaryLocation = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
                     GlobalDefinitions.driver = new ChromeDriver(options);
-                 
+
                     GlobalDefinitions.driver.Manage().Window.Maximize();
                     break;
 
             }
 
             #region Initialise Reports
-         
 
-                
+
+
             extent = new ExtentReports(ReportPath, false, DisplayOrder.NewestFirst);
             extent.LoadConfig(MarsResource.ReportXMLPath);
-   test =  extent.StartTest("Skilltest");
+            test = extent.StartTest("Skilltest");
             #endregion
 
             if (MarsResource.IsLogin == "true")
@@ -65,6 +65,14 @@ namespace MarsFramework.Global
                 obj.register();
             }
 
+        }
+
+        [Test]
+
+        public void shareSkill()
+        {
+            ShareSkill test = new ShareSkill();
+            test.EnterShareSkill();
         }
 
 

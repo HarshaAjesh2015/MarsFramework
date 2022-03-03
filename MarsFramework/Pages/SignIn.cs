@@ -35,7 +35,9 @@ namespace MarsFramework.Pages
             GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "SignIn");
             Global.GlobalDefinitions.driver.Navigate().GoToUrl(GlobalDefinitions.ExcelLib.ReadData(2,"Url"));
 
-            Global.GlobalDefinitions.WaitForElement(Global.GlobalDefinitions.driver, By.XPath("//*[@id='home']/div/div/div[1]/div/a"), 2);
+            Global.GlobalDefinitions.wait(5);
+
+            //Global.GlobalDefinitions.WaitForElement(Global.GlobalDefinitions.driver, By.XPath("//*[@id='home']/div/div/div[1]/div/a"), 2);
 
             SignIntab.Click();
 

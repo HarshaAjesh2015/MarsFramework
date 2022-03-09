@@ -1,7 +1,10 @@
 ﻿using MarsFramework.Global;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace MarsFramework.Pages
 {
@@ -64,24 +67,27 @@ namespace MarsFramework.Pages
         private IWebElement EndDateDropDown { get; set; }
 
         //Storing the table of available days
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[7]/div[2]/div/div[2]/div[1]/div/input")]
-        private IWebElement Days { get; set; }
+        [FindsBy(How = How.Name, Using = "Available")]
+        private IList<IWebElement> Days { get; set; }
 
         //Storing the starttime
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[7]/div[2]/div/div[2]/div[2]/input")]
-        private IWebElement StartTime { get; set; }
+        [FindsBy(How = How.Name, Using = "StartTime")]
+        private IList<IWebElement> StartTime { get; set; }
+
+        [FindsBy(How = How.Name, Using = "EndTime")]
+        private IList<IWebElement> EndTime { get; set; }
 
         //Click on StartTime dropdown
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[7]/div[2]/div/div[2]/div[2]/input")]
-        private IWebElement StartTimeDropDown { get; set; }
+        //[FindsBy(How = How.Name, Using = "StartTime")]
+        //private IWebElement StartTimeDropDown { get; set; }
 
-        //Click on EndTime dropdown
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[7]/div[2]/div/div[2]/div[3]/input")]
-        private IWebElement EndTimeDropDown { get; set; }
+        ////Click on EndTime dropdown
+        //[FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[7]/div[2]/div/div[2]/div[3]/input")]
+        //private IWebElement EndTimeDropDown { get; set; }
 
         //Click on Skill Trade option
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[8]/div[2]/div/div[1]/div/input")]
-        private IWebElement SkillTradeOption { get; set; }
+        [FindsBy(How = How.Name, Using = "skillTrades")]
+        private IList<IWebElement> SkillTradeOption { get; set; }
 
         //Enter Skill Exchange
         [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[8]/div[4]/div/div/div/div/div/input")]
@@ -92,8 +98,8 @@ namespace MarsFramework.Pages
         private IWebElement CreditAmount { get; set; }
 
         //Click on Active/Hidden option
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[10]/div[2]/div/div[1]/div/input")]
-        private IWebElement ActiveOption { get; set; }
+        [FindsBy(How = How.Name, Using = "isActive")]
+        private IList<IWebElement> ActiveOption { get; set; }
 
         //Click on Save button
         [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[11]/div/input[1]")]
@@ -103,78 +109,178 @@ namespace MarsFramework.Pages
         [FindsBy(How = How.XPath, Using = "//*[@id='service-listing-section']/div[2]/div/form/div[11]/div/input[2]")]
         private IWebElement Cancel { get; set; }
 
+        //Find Manage Listings Page
+        [FindsBy(How = How.XPath, Using = "//*[@id='listing-management-section']/div[2]/h2")]
+        private IWebElement manageListingsText { get; set; }
+
         internal void EnterShareSkill()
         {
-            ShareSkillButton.Click();
-
-            GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
-
-            Global.GlobalDefinitions.wait(2);
-
-            Title.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Title"));
-
-            Description.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Description"));
-
-            CategoryDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Category"));
-
-            SubCategoryDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "SubCategory"));
-
-            Tags.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Tags"));
-
-            Tags.SendKeys(Keys.Enter);
-
-            var serviceOption = GlobalDefinitions.ExcelLib.ReadData(2, "ServiceType");
-
-            if (serviceOption == "Hourly basis service")
+            try
             {
-                serviceOptions[0].Click();
+
+                ShareSkillButton.Click();
+                GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ShareSkill");
+                Global.GlobalDefinitions.wait(2);
+                Title.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Title"));
+                Description.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Description"));
+                CategoryDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Category"));
+                SubCategoryDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "SubCategory"));
+                Tags.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Tags"));
+                Tags.SendKeys(Keys.Enter);
+
+                var serviceOption = GlobalDefinitions.ExcelLib.ReadData(2, "ServiceType");
+
+                if (serviceOption == "Hourly basis service")
+                {
+                    serviceOptions[0].Click();
+                }
+                else
+                {
+                    serviceOptions[1].Click();
+                }
+
+                var locationTypeValue = GlobalDefinitions.ExcelLib.ReadData(2, "LocationType");
+
+                if (locationTypeValue == "On-site")
+                {
+                    LocationTypeOption[0].Click();
+                }
+                else
+                {
+                    LocationTypeOption[1].Click();
+                }
+
+                StartDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Startdate"));
+                EndDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Enddate"));
+
+                //Days.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Selectday"));
+
+                var availableDays = GlobalDefinitions.ExcelLib.ReadData(2, "Selectday");
+                var availDays = availableDays.Split(new char[] { ',' });
+                var startTime = GlobalDefinitions.ExcelLib.ReadData(2, "Starttime");
+                var timeStart = DateTime.Parse(startTime).ToString("hhmmtt");
+                var endTime = GlobalDefinitions.ExcelLib.ReadData(2, "Endtime");
+                var timeEnd = DateTime.Parse(endTime).ToString("hhmmtt");
+
+                foreach (var day in availDays)
+                {
+                    switch (day)
+                    {
+                        case "Sun":
+                            Days[0].Click();
+                            StartTime[0].Click();
+                            StartTime[0].SendKeys(timeStart);
+                            EndTime[0].Click();
+                            EndTime[0].SendKeys(endTime);
+                            break;
+                        case "Mon":
+                            Days[1].Click();
+                            StartTime[1].Click();
+                            StartTime[1].SendKeys(timeStart);
+                            EndTime[1].Click();
+                            EndTime[1].SendKeys(timeEnd);
+                            break;
+                        case "Tue":
+                            Days[2].Click();
+                            StartTime[2].Click();
+                            StartTime[2].SendKeys(timeStart);
+                            EndTime[2].Click();
+                            EndTime[2].SendKeys(timeEnd);
+                            break;
+                        case "Wed":
+                            Days[3].Click();
+                            StartTime[3].Click();
+                            StartTime[3].SendKeys(timeStart);
+                            EndTime[3].Click();
+                            EndTime[3].SendKeys(timeEnd);
+                            break;
+                        case "Thu":
+                            Days[4].Click();
+                            StartTime[4].Click();
+                            StartTime[4].SendKeys(timeStart);
+                            EndTime[4].Click();
+                            EndTime[4].SendKeys(timeEnd);
+                            break;
+                        case "Fri":
+                            Days[5].Click();
+                            StartTime[5].Click();
+                            StartTime[5].SendKeys(timeStart);
+                            EndTime[5].Click();
+                            EndTime[5].SendKeys(timeEnd);
+                            break;
+                        case "Sat":
+                            Days[6].Click();
+                            StartTime[6].Click();
+                            StartTime[6].SendKeys(timeStart);
+                            EndTime[6].Click();
+                            EndTime[6].SendKeys(timeEnd);
+                            break;
+                    }
+
+                    
+                }
+
+                Global.GlobalDefinitions.wait(2);
+
+                var tradeSkillOptions = GlobalDefinitions.ExcelLib.ReadData(2, "SkillTrade");
+
+                if (tradeSkillOptions == "Skill-Exchange")
+                {
+                    SkillTradeOption[0].Click();
+
+                    SkillExchange.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Skill-Exchange"));
+
+                    SkillExchange.SendKeys(Keys.Enter);
+
+                }
+                else
+                {
+                    SkillTradeOption[1].Click();
+
+                    CreditAmount.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Credit"));
+                }
+
+                Global.GlobalDefinitions.wait(2);
+
+                var actOrHide = GlobalDefinitions.ExcelLib.ReadData(2, "Active");
+
+                if (actOrHide == "Active")
+                {
+                    ActiveOption[0].Click();
+                }
+                else
+                {
+                    ActiveOption[1].Click();
+                }
+
+                var saveORcancel = GlobalDefinitions.ExcelLib.ReadData(2, "Save Or Cancel");
+
+                if(saveORcancel=="Save")
+                {
+                    Save.Click();
+                }
+                else
+                {
+                    Cancel.Click();
+                }
+
+                Thread.Sleep(2000);
+
+                Assert.IsTrue(manageListingsText.Text == "Manage Listings");
+
             }
-            else
+            catch (Exception ex)
             {
-                serviceOptions[1].Click();
+
+                Assert.IsTrue(false);
             }
-
-
-           var locationTypeValue=GlobalDefinitions.ExcelLib.ReadData(2, "LocationType");
-
-            if(locationTypeValue == "On-site")
-            {
-                LocationTypeOption[0].Click();
-            }
-            else
-            {
-                LocationTypeOption[1].Click();
-            }
-
-            StartDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Startdate"));
-
-            EndDateDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Enddate"));
-
-            Days.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Selectday"));
-
-            StartTime.Click();
-
-            StartTimeDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Starttime"));
-
-            EndTimeDropDown.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Endtime"));
-
-            SkillTradeOption.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "SkillTrade"));
-
-            SkillExchange.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Skill-Exchange"));
-
-
-
-            ActiveOption.SendKeys(GlobalDefinitions.ExcelLib.ReadData(2, "Active"));
-
-            Save.Click();
-
-
-
         }
 
         internal void EditShareSkill()
         {
 
+
         }
+              
     }
 }

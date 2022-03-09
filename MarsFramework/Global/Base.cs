@@ -67,12 +67,27 @@ namespace MarsFramework.Global
 
         }
 
-        [Test]
+        [Test, Order(1)]
 
         public void shareSkill()
         {
             ShareSkill test = new ShareSkill();
             test.EnterShareSkill();
+        }
+
+        [Test,Order(2)]
+        public void manageViewListings()
+        {
+            ManageListings test = new ManageListings();
+            test.viewListings();
+        }
+
+
+        [Test,Order(3)]
+        public void manageDeleteListings()
+        {
+            ManageListings test = new ManageListings();
+            test.deleteListings();
         }
 
 

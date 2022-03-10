@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -38,14 +39,16 @@ namespace MarsFramework.Pages
         private IWebElement clickNoButton { get; set; }
 
         //Find element Chat
-        [FindsBy(How = How.XPath, Using = "//*[@id='service-detail-section']/div[2]/div/div[2]/div[2]/div[1]/div/div[1]/div/a")]
-        private IWebElement chatButton { get; set; }
+        [FindsBy(How = How.XPath, Using = "//*[@id='service-detail-section']/div[2]/div/div[2]/div[1]/div[2]/div/h3")]
+        private IWebElement avgRatingBtn { get; set; }
 
         [FindsBy(How = How.XPath, Using = "//*[@id='listing-management-section']/div[2]/div[1]/div[1]/table")]
         private IWebElement baseTable { get; set; }
 
         internal void viewListings()
         {
+            //try
+            //{
             GlobalDefinitions.ExcelLib.PopulateInCollection(Base.ExcelPath, "ManageListings");
             manageListingsLink.Click();
             Global.GlobalDefinitions.wait(3);
@@ -57,16 +60,16 @@ namespace MarsFramework.Pages
                 IList<IWebElement> cells = allRows[i].FindElements(By.TagName("td"));
                 if (cells[2].Text == viewTitle)
                 {
-
+                    Thread.Sleep(2000);
                     var viewBtn = baseTable.FindElement(By.XPath($"//*[@id='listing-management-section']/div[2]/div[1]/div[1]/table/tbody/tr[{i}]/td[8]/div/button[1]"));
+                    Global.GlobalDefinitions.wait(2);
                     viewBtn.Click();
-
+                    break;
                 }
 
             }
-
             Thread.Sleep(2000);
-            Assert.IsTrue(chatButton.Text == "Chat");
+            Assert.IsTrue(avgRatingBtn.Text == "Average Ratings");
 
         }
         internal void deleteListings()
@@ -83,20 +86,23 @@ namespace MarsFramework.Pages
                 IList<IWebElement> cells = allRows[i].FindElements(By.TagName("td"));
                 if (cells[2].Text == viewTitle)
                 {
-
-                    var deleteBtn = baseTable.FindElement(By.XPath($"//*[@id='listing-management-section']/div[2]/div[1]/div[1]/table/tbody/tr[{i}]/td[8]/div/button[3]/i"));
                     Global.GlobalDefinitions.wait(2);
+                    var deleteBtn = baseTable.FindElement(By.XPath($"//*[@id='listing-management-section']/div[2]/div[1]/div[1]/table/tbody/tr[{i}]/td[8]/div/button[3]/i"));
                     deleteBtn.Click();
+                    Global.GlobalDefinitions.wait(2);
                     var selectAction = GlobalDefinitions.ExcelLib.ReadData(2, "Deleteaction");
                     Global.GlobalDefinitions.wait(2);
-                    if (selectAction == "yes")
+                    if (selectAction == "Yes")
                     {
+                        Thread.Sleep(2000);
                         clickYesButton.Click();
                     }
                     else
                     {
+                        Thread.Sleep(2000);
                         clickNoButton.Click();
                     }
+                    break;
 
                 }
 

@@ -94,7 +94,7 @@ namespace MarsFramework.Pages
                     Global.GlobalDefinitions.wait(2);
                     if (selectAction == "Yes")
                     {
-                        Thread.Sleep(2000);
+                        
                         clickYesButton.Click();
                     }
                     else
